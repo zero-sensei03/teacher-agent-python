@@ -1,6 +1,7 @@
 import streamlit as st
 
 from src.agent.tasks import get_task_areas
+from src.agent.workflow import run_workflow
 
 
 st.set_page_config(
@@ -16,24 +17,45 @@ st.write(
 )
 
 st.info(
-    "Prototipe ini sedang dalam tahap pengembangan. "
+    "Prototipe ini masih dalam tahap pengembangan. "
     "Fitur utama akan disesuaikan berdasarkan hasil penelitian."
 )
 
 st.subheader("Eksplorasi kebutuhan")
-
-st.write(
-    "Pilih area pekerjaan yang ingin dieksplorasi. "
-    "Pilihan ini masih bersifat sementara."
-)
 
 area_pekerjaan = st.selectbox(
     "Area pekerjaan guru",
     ["Pilih area pekerjaan", *get_task_areas()],
 )
 
-if area_pekerjaan != "Pilih area pekerjaan":
-    st.write(f"Area yang dipilih: **{area_pekerjaan}**")
-    st.caption(
-        "Belum ada pemrosesan AI pada tahap ini."
-    )
+instruksi = st.text_area(
+    "Instruksi",
+    placeholder="Contoh: Buat materi pembelajaran IPA tentang ekosistem.",
+    max_chars=5000,
+    help="Masukkan instruksi yang ingin diuji.",
+)
+
+if st.button("Jalankan workflow", type="primary"):
+    if area_pekerjaan == "Pilih area pekerjaan":
+        st.warning("Silakan pilih area pekerjaan guru terlebih dahulu.")
+    else:
+        hasil = run_workflow(instruksi)
+
+        if hasil.success:
+            st.success(hasil.message)
+        else:
+            st.error(hasil.message)
+
+        if hasil.content:
+            st.subheader("Hasil")
+            st.write(hasil.content)
+
+        if hasil.requires_review and hasil.success:
+            st.info(
+                "Hasil perlu diperiksa oleh guru sebelum digunakan."
+            )
+
+        st.caption(
+            "Status: validasi instruksi saja. "
+            "Pemrosesan AI belum diimplementasikan."
+        )
