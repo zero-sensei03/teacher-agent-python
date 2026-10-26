@@ -1,5 +1,8 @@
 import streamlit as st
 
+from src.agent.tasks import get_task_areas
+
+
 st.set_page_config(
     page_title="Teacher Assistant Agent",
     page_icon="📚",
@@ -14,27 +17,19 @@ st.write(
 
 st.info(
     "Prototipe ini sedang dalam tahap pengembangan. "
-    "Fitur utama akan ditentukan dan disesuaikan berdasarkan "
-    "kebutuhan yang ditemukan dalam penelitian."
+    "Fitur utama akan disesuaikan berdasarkan hasil penelitian."
 )
 
 st.subheader("Eksplorasi kebutuhan")
 
 st.write(
     "Pilih area pekerjaan yang ingin dieksplorasi. "
-    "Pilihan ini masih bersifat sementara dan bukan penetapan "
-    "masalah utama penelitian."
+    "Pilihan ini masih bersifat sementara."
 )
 
 area_pekerjaan = st.selectbox(
     "Area pekerjaan guru",
-    [
-        "Pilih area pekerjaan",
-        "Penyusunan materi pembelajaran",
-        "Pembuatan soal dan pembahasan",
-        "Pemeriksaan jawaban dan pengolahan nilai",
-        "Administrasi pembelajaran",
-    ],
+    ["Pilih area pekerjaan", *get_task_areas()],
 )
 
 if area_pekerjaan != "Pilih area pekerjaan":
