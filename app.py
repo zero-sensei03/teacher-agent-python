@@ -3,7 +3,7 @@ import streamlit as st
 from src.agent.config import get_ai_settings
 from src.agent.tasks import get_task_areas
 from src.agent.workflow import run_workflow
-
+from src.agent.history import get_history, save_history
 
 st.set_page_config(
     page_title="Teacher Assistant Agent",
@@ -50,6 +50,12 @@ if st.button("Jalankan AI", type="primary"):
 
         if hasil.success:
             st.success(hasil.message)
+
+            save_history(
+                task_area=area_pekerjaan,
+                instruction=instruksi.strip(),
+                content=hasil.content,
+            )
             st.subheader("Hasil AI")
             st.markdown(hasil.content)
 
@@ -60,3 +66,24 @@ if st.button("Jalankan AI", type="primary"):
                 )
         else:
             st.error(hasil.message)
+
+st.divider()
+st.subheader("📚 Riwayat Hasil AI")
+
+try:
+    riwayat = get_history(limit=20)
+
+    if not riwayat:
+        st.caption("Belum ada riwayat hasil AI.")
+    else:
+        for item in riwayat:
+            with st.expander(
+                f"#{item['id']} · {item['task_area']} · {item['created_at']}"
+            ):
+                st.markdown("**Instruksi:**")
+                st.write(item["instruction"])
+                st.markdown("**Hasil:**")
+                st.markdown(item["content"])
+
+except Exception:
+    st.error("Gagal memuat riwayat hasil AI.")
