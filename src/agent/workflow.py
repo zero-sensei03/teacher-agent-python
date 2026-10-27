@@ -5,6 +5,41 @@ from src.agent.result import AgentResult
 from src.agent.validation import validate_instruction
 
 
+TASK_PROMPTS = {
+    "Penyusunan materi pembelajaran": """
+Susun materi dengan bagian:
+1. Judul dan sasaran kelas
+2. Tujuan pembelajaran
+3. Penjelasan materi
+4. Contoh yang relevan
+5. Rangkuman
+6. Pertanyaan evaluasi beserta kunci jawaban.
+""",
+    "Pembuatan soal dan pembahasan": """
+Susun soal sesuai instruksi dengan bagian:
+1. Mata pelajaran dan sasaran kelas
+2. Tujuan atau kompetensi yang diukur
+3. Soal
+4. Kunci jawaban
+5. Pembahasan setiap soal.
+Pastikan soal jelas, tidak ambigu, dan sesuai tingkat kelas.
+""",
+    "Pemeriksaan jawaban dan pengolahan nilai": """
+Bantu meninjau jawaban berdasarkan kriteria yang diberikan.
+Sajikan rubrik penilaian, analisis jawaban, rekomendasi skor beserta
+alasannya, dan catatan untuk guru.
+Jangan mengarang jawaban siswa atau kriteria yang tidak diberikan.
+Rekomendasi skor harus diverifikasi guru.
+""",
+    "Administrasi pembelajaran": """
+Susun dokumen administrasi pembelajaran secara terstruktur,
+konsisten, dan mudah disunting.
+Jangan mengarang data sekolah, guru, atau peserta didik.
+Nyatakan asumsi jika informasi penting belum diberikan.
+""",
+}
+
+
 def run_workflow(
     instruction: str,
     task_area: str = "Pekerjaan guru",
@@ -20,31 +55,41 @@ def run_workflow(
             message=str(exc),
         )
 
+    task_guidance = TASK_PROMPTS.get(
+        task_area,
+        "Berikan hasil yang terstruktur dan praktis sesuai instruksi guru.",
+    )
+
     prompt = f"""
 Anda adalah Teacher Assistant Agent untuk membantu guru SMP/MTs.
 
 Area pekerjaan: {task_area}
 
+Panduan area pekerjaan:
+{task_guidance}
+
 Instruksi guru:
 {cleaned_instruction}
 
-Ketentuan:
-- Gunakan bahasa Indonesia yang jelas dan sesuai kebutuhan guru.
-- Susun hasil secara terstruktur dan praktis.
+Ketentuan umum:
+- Gunakan bahasa Indonesia yang jelas.
 - Jangan mengarang fakta atau referensi.
-- Jika informasi penting kurang, nyatakan asumsi yang digunakan.
+- Nyatakan asumsi jika informasi penting kurang.
 - Hasil wajib ditinjau guru sebelum digunakan.
 """.strip()
 
     try:
         content = generate_text(prompt)
+
     except ValueError as exc:
         return AgentResult(
             success=False,
             content="",
             message=str(exc),
         )
+
     except Exception as exc:
+        # Penanganan spesifik OpenAI hanya jika exception berasal dari SDK OpenAI.
         from openai import (
             APIConnectionError,
             AuthenticationError,
@@ -77,8 +122,6 @@ Ketentuan:
                 "Gagal menghubungi provider AI. "
                 "Periksa konfigurasi, koneksi internet, dan log aplikasi."
             )
-        # else:
-        #     message = f"Kesalahan provider AI: {type(exc).__name__}"
 
         return AgentResult(
             success=False,
