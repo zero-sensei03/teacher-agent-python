@@ -1,73 +1,48 @@
 # Teacher Assistant Agent
 
-Prototipe aplikasi berbasis Python dan Streamlit untuk mengeksplorasi penerapan AI Agent dalam membantu pekerjaan guru SMP/MTs.
+Prototipe asisten AI untuk membantu pekerjaan guru SMP/MTs.
 
-## Status Proyek
-
-Tahap pengembangan fondasi aplikasi.
-
-Fitur utama belum ditetapkan karena rancangan prototipe perlu disesuaikan dengan hasil analisis kebutuhan penelitian.
-
-## Teknologi
-
-- Python 3.12
-- Streamlit 1.66.1
-- Git
+## Fitur
+- Empat area pekerjaan guru.
+- Integrasi provider OpenAI dan Google Gemini.
+- Validasi instruksi maksimal 5.000 karakter.
+- Prompt khusus berdasarkan area pekerjaan.
+- Riwayat hasil AI menggunakan SQLite.
+- Peninjauan hasil oleh guru sebelum digunakan.
 
 ## Persiapan
+Aktifkan virtual environment:
 
-Pastikan Python 3.12 atau versi kompatibel telah terpasang.
+    source .venv/bin/activate
 
-### 1. Clone atau buka direktori proyek
+Instal dependensi:
 
-Jika proyek sudah tersedia secara lokal, masuk ke direktori proyek.
+    pip install -r requirements.txt
 
-### 2. Buat virtual environment
+Konfigurasikan provider dan API key melalui file `.env`.
+Gunakan `.env.example` sebagai acuan. Jangan commit API key.
 
-```bash
-python3 -m venv .venv
-```
+## Menjalankan aplikasi
 
-### 3. Aktifkan virtual environment
+    streamlit run app.py
 
-Linux:
+## Menjalankan pengujian
 
-```bash
-source .venv/bin/activate
-```
+    python -m pytest -q
 
-### 4. Instal dependensi
+## Struktur utama
+- `app.py`: antarmuka Streamlit.
+- `src/agent/config.py`: konfigurasi provider AI.
+- `src/agent/providers.py`: integrasi API AI.
+- `src/agent/tasks.py`: daftar area pekerjaan guru.
+- `src/agent/validation.py`: validasi instruksi.
+- `src/agent/workflow.py`: alur pemrosesan instruksi.
+- `src/agent/result.py`: struktur hasil workflow.
+- `src/agent/history.py`: penyimpanan dan pembacaan riwayat.
+- `tests/`: pengujian otomatis.
+- `data/history.db`: database riwayat yang dibuat otomatis.
 
-```bash
-python -m pip install -r requirements.txt
-```
-
-### 5. Jalankan aplikasi
-
-```bash
-streamlit run app.py
-```
-
-Buka alamat lokal yang ditampilkan oleh Streamlit di browser.
-
-## Struktur Proyek
-
-```text
-teacher-assistant-agent/
-├── app.py
-├── requirements.txt
-├── README.md
-├── .gitignore
-├── src/
-│   └── agent/
-│       └── __init__.py
-└── tests/
-```
-
-## Prinsip Pengembangan
-
-- Fitur dikembangkan secara bertahap berdasarkan kebutuhan penelitian.
-- Hasil AI harus dapat diperiksa oleh guru sebelum digunakan.
-- Data pribadi guru dan siswa harus dilindungi.
-- Hasil AI tidak dianggap selalu benar.
-- Pengujian dilakukan sebelum fitur dinyatakan siap digunakan.
+## Catatan
+Prototipe masih memerlukan evaluasi dengan kebutuhan guru yang nyata.
+Hasil AI harus diperiksa sebelum digunakan. Hindari memasukkan data
+pribadi atau sensitif siswa.
